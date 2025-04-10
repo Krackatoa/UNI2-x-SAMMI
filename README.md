@@ -56,4 +56,4 @@ The above Extension Triggers are available for use. Add them to buttons via a bu
 
 ## More Information
 
-Check out the documentation for [TheLettuceClub's Mod](https://github.com/TheLettuceClub/BBCF-Sammi) for more information.
+Check out the documentation for [TheLettuceClub's Mod](https://github.com/TheLettuceClub/UNI2xSAMMI-Release/) for more information.
