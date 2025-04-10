@@ -1,0 +1,190 @@
+[extension_name]
+UNDER NIGHT IN-BIRTH II Sys:Celes x Sammi
+[extension_info]
+With TheLettuceClub's UNI2 Live Content Mod installed, pipe live gamestate data from UNDER NIGHT IN-BIRTH II Sys:Celes (Steam Version) directly into Sammi.
+[extension_version]
+1.4.0
+[insert_external]
+<script>
+    const UNI2_Websocket_Names = [];
+    const UNI2_Websockets = [];
+	let UNI2_Connected = 0;
+	
+</script>
+<div class="row">
+  <div class="col-12 col-md-8 col-lg-6 mx-auto">
+    <div class="card bg-dark text-white">
+      <div class="card-header">
+        <h3>UNI2 x Sammi</h3>
+        <div class="d-flex justify-content-between align-items-center">
+		<h5><div id="UNI2-connection-status">Connection: OFF</div></h5>
+          <h5>Version: 1.4.0</h5> 
+          <a href="https://github.com/TheLettuceClub/UNI2xSAMMI-Release" class="btn btn-dark" target="_blank" rel="noopener noreferrer">Download TheLettuceClub's Mod Here</a>
+        </div>
+      </div>
+      <div class="card-body">
+        <h4 class="card-title">Overview</h4>
+        <p class="card-text">Trigger Sammi events from UNI2. </p>
+		<p>Made possible by TheLettuceClub's UNI2 Live Content Mod. </p>
+        <hr>
+		<h4 class="card-title">Instructions</h4>
+		<p>Connect to UNI2 via the <i>Create UNI2 Websocket</i> command, then make use of the following Extension Triggers, paired with the <i>Trigger Pull Data</i> command:</p>
+		<p><i>uni2_StateUpdate</i> - General game updates. 60Hz tick rate.<br><br>
+		<i>uni2_HitEvent</i> - On Hit and On Block events.<br><br>
+		<i>uni2_ComboStartEvent</i> - On Combo Start.<br><br>
+		<i>uni2_ComboEndEvent</i> - On Combo End.<br><br>
+		<i>uni2_RoundStartEvent</i> - On Round Start.<br><br>
+		<i>uni2_RoundEndEvent</i> - On Round End.<br><br>
+		<i>uni2_VorpalEvent</i> - On Vorpal.<br><br>
+		</p>
+		<p>Note: These triggers only occur during gameplay.</p>
+		<hr>
+		<h4 class="card-title">Socials</h4>
+        <p>Extension created by Krackatoa. Follow me on:</p>
+        <div class="social-icons">
+			<a href="https://bsky.app/profile/krackatoa.ca" style="text-decoration: none;" target="_blank" rel="noopener noreferrer">Bluesky</a><br>
+			<a href="https://twitch.tv/krackatoa" style="text-decoration: none;" target="_blank" rel="noopener noreferrer">Twitch</a><br>
+			<a href="https://youtube.com/krackatoa" style="text-decoration: none;" target="_blank" rel="noopener noreferrer">YouTube</a><br>
+			<a href="http://www.twitter.com/koryuken" style="text-decoration: none;" target="_blank" rel="noopener noreferrer">Twitter</a><br><br>		
+        </div>
+		<p>Mod created by TheLettuceClub. Follow him on:</p>
+        <div class="social-icons">
+			<a href="https://bsky.app/profile/nleff72.bsky.social" style="text-decoration: none;" target="_blank" rel="noopener noreferrer">Bluesky</a><br>
+			<a href="https://twitter.com/nleff72" style="text-decoration: none;" target="_blank" rel="noopener noreferrer">Twitter</a><br>			
+        </div>
+      </div>
+      <div class="card-footer">
+        <small>Last updated: 2025-12-2, Websocket Extension Code by failstream.</small>
+      </div>
+    </div>
+  </div>
+</div>
+[insert_command]
+
+SAMMI.extCommand('Create UNI2 Websocket', 3355443, 52, {
+    url: ['Websocket URL (UNI2 Webserver)', 14, 'ws://localhost:12524', 1]
+});
+
+// Call the main function when the extension loads
+UNI2_Main();
+[insert_hook]
+[insert_script]
+async function UNI2_CreateWebsocket(url) {
+   try {
+		
+		if (!url) {
+            throw 'Websocket: url field is not optional!';
+        } 
+		let UNI2_name = "uni2_websocket";
+        let UNI2_name_exists = UNI2_Websocket_Names.indexOf(UNI2_name);
+		
+        if (UNI2_name_exists == -1) {
+            UNI2_Websocket_Names.push(UNI2_name);
+            let i = UNI2_Websocket_Names.indexOf(UNI2_name);
+            UNI2_Websockets[i] = new WebSocket(url);
+            UNI2_Websockets[i].onopen = function (event) {
+
+				if(UNI2_Connected == 0)
+				{
+					UNI2_connectionStatusElement = document.getElementById('UNI2-connection-status');
+					UNI2_connectionStatusElement.textContent = 'Connection: ON';
+					SAMMI.alert('UNI2 has connected!');
+					console.log('UNI2 has connected!');
+					UNI2_Connected = 1;
+				}
+            };
+			
+            UNI2_Websockets[i].onclose = function (event) 
+			{
+                if(UNI2_Connected == 1)
+				{
+					SAMMI.alert('UNI2 has disconnected!');
+					console.log('UNI2 has disconnected!');
+					UNI2_Connected = 0;
+					UNI2_connectionStatusElement = document.getElementById('UNI2-connection-status');
+					UNI2_connectionStatusElement.textContent = 'Connection: OFF';
+				}					
+				UNI2_RemoveWebsocket(UNI2_Websocket_Names[i]);
+				UNI2_Websocket_Names.splice(i, 1);
+				SAMMI.triggerButton("UNI2_Connect");
+                
+            };
+			
+            UNI2_Websockets[i].onerror = function (event) {               
+                if (error) {
+                    console.log(error);
+                }               
+            };
+			
+            UNI2_Websockets[i].onmessage = function (event) 
+			{
+
+				//This is where you set up the logic for incoming info.					
+				obj = JSON.parse(event.data);
+				
+				if(obj.event == "uni2_StateUpdate")
+				{
+					SAMMI.triggerExt('uni2_StateUpdate', {data: obj});	
+				}
+				else if(obj.event == "uni2_HitEvent")
+				{
+					SAMMI.triggerExt('uni2_HitEvent', {data: obj});
+				}
+				else if(obj.event == "uni2_RoundStartEvent")
+				{
+					SAMMI.triggerExt('uni2_RoundStartEvent', {data: obj});
+				}
+				else if(obj.event == "uni2_RoundEndEvent")
+				{
+					SAMMI.triggerExt('uni2_RoundEndEvent', {data: obj});
+				}
+				else if(obj.event == "uni2_ComboStartEvent")
+				{
+					SAMMI.triggerExt('uni2_ComboStartEvent', {data: obj});
+				}
+				else if(obj.event == "uni2_ComboEndEvent")
+				{
+					SAMMI.triggerExt('uni2_ComboEndEvent', {data: obj});
+				}
+				else if(obj.event == "uni2_VorpalEvent")
+				{
+					SAMMI.triggerExt('uni2_VorpalEvent', {data: obj});
+				} else
+				{
+					SAMMI.triggerExt('uni2_unknownEvent', {data: obj});
+				}
+            };
+        } else {
+            throw 'UNI2 could not connect: ' + name;
+        } 
+
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+function UNI2_RemoveWebsocket(name) {
+    try {
+        if (!name) {
+            throw 'cannot remove websocket without a name!';
+        }
+        let i = UNI2_Websocket_Names.indexOf(name);
+        if (i != -1) {
+            UNI2_Websockets[i].close();
+        } else {
+            throw 'This websocket name: ' + name + ' does not exist! Cannot remove.';
+        }
+    } catch(e) {
+        SAMMI.alert(e)
+    }
+}
+
+function UNI2_Main() {
+    console.log("Kamone is God. Connecting to SAMMI Bridge.");
+
+	sammiclient.on('Create UNI2 Websocket', (payload) => {
+		//SAMMI.alert("Connecting to UNI2.");
+		UNI2_CreateWebsocket(payload.Data.url);		
+	});
+}
+[insert_over]
