@@ -37,13 +37,6 @@ It's a SAMMI thing. This can affect commands like Motion, so if you need to anim
 
 ### Accessing Events via Extension Triggers
 
-The following Extension Triggers are available for use. Add them to buttons via a button's Trigger menu. They all contain extremely relevant data within that can be accessed via the `Trigger Pull Data` command.
-
-(Examples stolen from the BlazBlue page)
-![image](https://github.com/user-attachments/assets/5fb3653e-e3a1-4cf3-bf19-fef4c63b8e81)
-
-![image](https://github.com/user-attachments/assets/8b990172-a513-4a91-85a7-73fdf5f164d3)
-
 | Extension Trigger | Description |
 | --- | --- |
 | `uni2_StateUpdate`| Occurs once a frame. Contains all sorts of cool gamestate data. |
@@ -54,6 +47,12 @@ The following Extension Triggers are available for use. Add them to buttons via 
 | `uni2_RoundEndEvent` | Occurs on Round End. |
 | `uni2_VorpalEvent` | Occurs on Vorpal. |
 
+The above Extension Triggers are available for use. Add them to buttons via a button's Trigger menu. They all contain extremely relevant data within that can be accessed via the `Trigger Pull Data` command.
+
+(Examples stolen from the BlazBlue page)
+![image](https://github.com/user-attachments/assets/5fb3653e-e3a1-4cf3-bf19-fef4c63b8e81)
+
+![image](https://github.com/user-attachments/assets/8b990172-a513-4a91-85a7-73fdf5f164d3)
 
 ## More Information
 
